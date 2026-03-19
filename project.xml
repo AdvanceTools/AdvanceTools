@@ -16,7 +16,7 @@
 		  company="AdvanceTools" />
 
 	<!-- ========================= -->
-	<!-- WINDOW / DISPLAY -->
+	<!-- WINDOW -->
 	<!-- ========================= -->
 	<window width="1280"
 			height="720"
@@ -38,19 +38,33 @@
 	<haxelib name="openfl" />
 
 	<!-- ========================= -->
-	<!-- HTML5 TARGET -->
+	<!-- TARGETS -->
 	<!-- ========================= -->
 	<target name="html5" />
+	<target name="android" />
 
+	<!-- ========================= -->
+	<!-- HTML5 SETTINGS -->
+	<!-- ========================= -->
 	<define name="webgl" if="html5" />
 	<define name="canvas" if="html5" />
 	<define name="dom" if="html5" />
-
-	<!-- ========================= -->
-	<!-- OPTIMIZATION -->
-	<!-- ========================= -->
 	<define name="minify" if="html5" />
 	<define name="source-map" if="debug" />
+
+	<!-- ========================= -->
+	<!-- ANDROID SETTINGS -->
+	<!-- ========================= -->
+	<android target-sdk-version="33"
+			 min-sdk-version="21"
+			 install-location="auto" />
+
+	<!-- Permissões básicas -->
+	<android-permission name="android.permission.INTERNET" />
+	<android-permission name="android.permission.ACCESS_NETWORK_STATE" />
+
+	<!-- Tela cheia -->
+	<android fullscreen="true" />
 
 	<!-- ========================= -->
 	<!-- PERFORMANCE -->
@@ -65,7 +79,7 @@
 	<set name="BUILD_TYPE" value="debug" if="debug" />
 
 	<!-- ========================= -->
-	<!-- CUSTOM SYSTEM FLAGS -->
+	<!-- CUSTOM FLAGS -->
 	<!-- ========================= -->
 	<define name="ADVANCED_TOOLS" />
 	<define name="ENABLE_AI_MODULE" />
