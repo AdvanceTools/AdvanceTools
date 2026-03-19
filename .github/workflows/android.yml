@@ -1,7 +1,7 @@
 name: Build AdvanceTools (Android)
 
 on:
-  push:
+ push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
@@ -27,25 +27,38 @@ jobs:
           java-version: '11'
 
       # =========================
-      # ANDROID SDK
+      # MANUAL ANDROID SDK SETUP (FIX)
       # =========================
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Setup Android SDK manually
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
 
-      # =========================
-      # ACCEPT LICENSES
-      # =========================
-      - name: Accept licenses
-        run: yes | sdkmanager --licenses
+          mkdir -p $HOME/android-sdk
+          cd $HOME/android-sdk
+
+          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
+          unzip cmdline-tools.zip
+
+          mkdir -p cmdline-tools/latest
+          mv cmdline-tools/* cmdline-tools/latest/ || true
+
+          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
 
       # =========================
       # INSTALL SDK COMPONENTS
       # =========================
-      - name: Install Android components
+      - name: Install Android packages
         run: |
+          yes | sdkmanager --licenses
+
           sdkmanager "platform-tools" \
                      "platforms;android-33" \
-                     "build-tools;33.0.2"
+                     "build-tools;33.0.2" \
+                     "ndk;25.1.8937393"
 
       # =========================
       # SETUP HAXE
@@ -64,9 +77,9 @@ jobs:
           haxelib install openfl
 
       # =========================
-      # SETUP LIME ANDROID
+      # SETUP LIME
       # =========================
-      - name: Setup Lime (Android)
+      - name: Setup Lime Android
         run: |
           haxelib run lime setup android
 
@@ -78,11 +91,10 @@ jobs:
           haxelib run lime build android -release
 
       # =========================
-      # DEBUG FILES
+      # DEBUG
       # =========================
-      - name: Show build files
+      - name: Show files
         run: |
-          echo "Listing files..."
           ls -R
 
       # =========================
@@ -93,6 +105,5 @@ jobs:
         with:
           name: android-build
           path: |
-            export/android/bin/app/build/outputs/apk/release/
-            export/android/bin/
+            export/android/
             bin/android/
