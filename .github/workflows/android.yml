@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
 
       # =========================
-      # JAVA (FIXED)
+      # JAVA (REQUIRED)
       # =========================
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -27,13 +27,18 @@ jobs:
           java-version: 17
 
       # =========================
+      # BUILD TOOLS (C++)
+      # =========================
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential wget unzip
+
+      # =========================
       # ANDROID SDK SETUP
       # =========================
       - name: Setup Android SDK
         run: |
-          sudo apt-get update
-          sudo apt-get install -y wget unzip
-
           mkdir -p $HOME/android-sdk
           cd $HOME/android-sdk
 
@@ -73,15 +78,18 @@ jobs:
           haxe-version: 4.3.7
 
       # =========================
-      # LIBS
+      # HAXE LIBRARIES
       # =========================
       - name: Install Haxe libraries
         run: |
           haxelib install lime
           haxelib install openfl
+          haxelib install hxcpp
+
+          haxelib run hxcpp setup
 
       # =========================
-      # LIME SETUP (IMPORTANT)
+      # LIME SETUP
       # =========================
       - name: Setup Lime Android
         run: |
@@ -102,7 +110,7 @@ jobs:
           ls -R
 
       # =========================
-      # UPLOAD
+      # UPLOAD APK
       # =========================
       - name: Upload APK
         uses: actions/upload-artifact@v4
