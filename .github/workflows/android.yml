@@ -1,7 +1,9 @@
-name: Build AdvanceTools (Signed APK)
+name: Build AdvanceTools (Android)
 
 on:
   push:
+    branches: [ main ]
+  pull_request:
     branches: [ main ]
 
 jobs:
@@ -12,11 +14,11 @@ jobs:
       # =========================
       # CHECKOUT
       # =========================
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       # =========================
-      # JAVA 17
+      # JAVA 17 (OBRIGATÓRIO)
       # =========================
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -25,12 +27,28 @@ jobs:
           java-version: 17
 
       # =========================
-      # BUILD TOOLS
+      # BUILD TOOLS + C++ FIX 🔥
       # =========================
-      - name: Install tools
+      - name: Install build tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential wget unzip
+          sudo apt-get install -y \
+            build-essential \
+            clang \
+            libc6-dev \
+            libstdc++6 \
+            g++ \
+            gcc \
+            wget \
+            unzip
+
+      # =========================
+      # FORCE COMPILER
+      # =========================
+      - name: Set C++ compiler
+        run: |
+          echo "CC=gcc" >> $GITHUB_ENV
+          echo "CXX=g++" >> $GITHUB_ENV
 
       # =========================
       # ANDROID SDK
@@ -56,7 +74,7 @@ jobs:
       # =========================
       # INSTALL SDK + NDK
       # =========================
-      - name: Install SDK
+      - name: Install Android packages
         run: |
           yes | sdkmanager --licenses
 
@@ -76,27 +94,42 @@ jobs:
           haxe-version: 4.3.7
 
       # =========================
-      # LIBS
+      # HAXE LIBS
       # =========================
-      - name: Install Haxe libs
+      - name: Install Haxe libraries
         run: |
           haxelib install lime
           haxelib install openfl
           haxelib install hxcpp
 
       # =========================
-      # LIME
+      # LIME SETUP (AUTO)
       # =========================
-      - name: Setup Lime
+      - name: Setup Lime Android
         run: |
-          haxelib run lime setup android
+          haxelib run lime setup android -y
 
       # =========================
       # BUILD APK
       # =========================
-      - name: Build APK
+      - name: Build Android
         run: |
           haxelib run lime build android -release
 
       # =========================
-      # DECODE KEYSTORE
+      # DEBUG
+      # =========================
+      - name: Show files
+        run: |
+          ls -R
+
+      # =========================
+      # UPLOAD APK
+      # =========================
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-build
+          path: |
+            export/android/
+            bin/android/
