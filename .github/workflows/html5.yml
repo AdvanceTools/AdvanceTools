@@ -26,7 +26,7 @@ jobs:
           haxe-version: 4.3.7
 
       # =========================
-      # INSTALL LIBRARIES
+      # INSTALL LIBS
       # =========================
       - name: Install dependencies
         run: |
@@ -48,10 +48,21 @@ jobs:
           haxelib run lime build html5 -release
 
       # =========================
-      # UPLOAD ARTIFACT
+      # DEBUG (IMPORTANT)
+      # =========================
+      - name: Show build files
+        run: |
+          echo "Listing all files..."
+          ls -R
+
+      # =========================
+      # UPLOAD BUILD (SAFE MODE)
       # =========================
       - name: Upload build
         uses: actions/upload-artifact@v4
         with:
           name: html5-build
-          path: export/html5/bin
+          path: |
+            export/
+            bin/
+            dist/
