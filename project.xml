@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+
+	<!-- ========================= -->
+	<!-- BASIC INFO -->
+	<!-- ========================= -->
+	<app title="AdvanceTools"
+		 file="advancetools"
+		 main="Main"
+		 version="1.0.0"
+		 company="AdvanceTools Team" />
+
+	<meta title="AdvanceTools"
+		  package="com.advancetools.engine"
+		  version="1.0.0"
+		  company="AdvanceTools" />
+
+	<!-- ========================= -->
+	<!-- WINDOW / DISPLAY -->
+	<!-- ========================= -->
+	<window width="1280"
+			height="720"
+			fps="60"
+			background="#0d0d1a"
+			orientation="landscape"
+			resizable="true"
+			vsync="true" />
+
+	<!-- ========================= -->
+	<!-- SOURCE -->
+	<!-- ========================= -->
+	<source path="source" />
+
+	<!-- ========================= -->
+	<!-- LIBRARIES -->
+	<!-- ========================= -->
+	<haxelib name="lime" />
+	<haxelib name="openfl" />
+
+	<!-- ========================= -->
+	<!-- HTML5 TARGET -->
+	<!-- ========================= -->
+	<target name="html5" />
+
+	<define name="webgl" if="html5" />
+	<define name="canvas" if="html5" />
+	<define name="dom" if="html5" />
+
+	<!-- ========================= -->
+	<!-- OPTIMIZATION -->
+	<!-- ========================= -->
+	<define name="minify" if="html5" />
+	<define name="source-map" if="debug" />
+
+	<!-- ========================= -->
+	<!-- PERFORMANCE -->
+	<!-- ========================= -->
+	<define name="allow-high-dpi" />
+	<define name="fast-mem" />
+
+	<!-- ========================= -->
+	<!-- BUILD MODES -->
+	<!-- ========================= -->
+	<set name="BUILD_TYPE" value="release" unless="debug" />
+	<set name="BUILD_TYPE" value="debug" if="debug" />
+
+	<!-- ========================= -->
+	<!-- CUSTOM SYSTEM FLAGS -->
+	<!-- ========================= -->
+	<define name="ADVANCED_TOOLS" />
+	<define name="ENABLE_AI_MODULE" />
+	<define name="ENABLE_UTILS" />
+
+</project>
