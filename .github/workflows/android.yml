@@ -1,9 +1,7 @@
-name: Build AdvanceTools (Android)
+name: Build AdvanceTools (Signed APK)
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
     branches: [ main ]
 
 jobs:
@@ -14,11 +12,11 @@ jobs:
       # =========================
       # CHECKOUT
       # =========================
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       # =========================
-      # JAVA 17 (OBRIGATÓRIO)
+      # JAVA 17
       # =========================
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -29,7 +27,7 @@ jobs:
       # =========================
       # BUILD TOOLS
       # =========================
-      - name: Install build tools
+      - name: Install tools
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential wget unzip
@@ -58,7 +56,7 @@ jobs:
       # =========================
       # INSTALL SDK + NDK
       # =========================
-      - name: Install Android packages
+      - name: Install SDK
         run: |
           yes | sdkmanager --licenses
 
@@ -78,36 +76,27 @@ jobs:
           haxe-version: 4.3.7
 
       # =========================
-      # HAXE LIBS
+      # LIBS
       # =========================
-      - name: Install Haxe libraries
+      - name: Install Haxe libs
         run: |
           haxelib install lime
           haxelib install openfl
           haxelib install hxcpp
 
       # =========================
-      # BUILD APK (SEM SETUP)
+      # LIME
       # =========================
-      - name: Build Android
+      - name: Setup Lime
+        run: |
+          haxelib run lime setup android
+
+      # =========================
+      # BUILD APK
+      # =========================
+      - name: Build APK
         run: |
           haxelib run lime build android -release
 
       # =========================
-      # DEBUG (VER ARQUIVOS)
-      # =========================
-      - name: Show files
-        run: |
-          ls -R
-
-      # =========================
-      # UPLOAD APK
-      # =========================
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-build
-          path: |
-            export/android/bin/app/build/outputs/apk/
-            export/android/
-            bin/android/
+      # DECODE KEYSTORE
