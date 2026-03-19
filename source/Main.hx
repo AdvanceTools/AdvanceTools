@@ -2,19 +2,26 @@ package;
 
 import openfl.display.Sprite;
 import openfl.events.Event;
+import openfl.events.DeactivateEvent;
 import openfl.Lib;
 
 #if html5
 import js.Browser;
 #end
 
+#if android
+import openfl.events.FocusEvent;
+#end
+
 class Main extends Sprite
 {
 	// =========================
-	// CORE VARIABLES
+	// CORE
 	// =========================
 	public static var instance:Main;
+
 	public var started:Bool = false;
+	public var paused:Bool = false;
 
 	// =========================
 	// CONSTRUCTOR
@@ -31,53 +38,71 @@ class Main extends Sprite
 	}
 
 	// =========================
-	// INITIALIZATION
+	// INIT
 	// =========================
 	function init(?e:Event):Void
 	{
 		removeEventListener(Event.ADDED_TO_STAGE, init);
 
-		trace("AdvanceTools Engine Initializing...");
+		trace("AdvanceTools Engine Starting...");
 
 		setupStage();
+		setupPlatform();
 		setupSystems();
 
 		started = true;
 
 		addEventListener(Event.ENTER_FRAME, update);
+
+		// Lifecycle (mobile + geral)
+		stage.addEventListener(Event.DEACTIVATE, onPause);
+		stage.addEventListener(Event.ACTIVATE, onResume);
 	}
 
 	// =========================
-	// STAGE CONFIG
+	// STAGE
 	// =========================
 	function setupStage():Void
 	{
 		stage.frameRate = 60;
+	}
 
+	// =========================
+	// PLATFORM DETECTION
+	// =========================
+	function setupPlatform():Void
+	{
 		#if html5
 		Browser.document.title = "AdvanceTools";
-		trace("Running on HTML5");
+		trace("Platform: HTML5");
+		#end
+
+		#if android
+		trace("Platform: Android");
+		#end
+
+		#if desktop
+		trace("Platform: Desktop");
 		#end
 	}
 
 	// =========================
-	// SYSTEM INITIALIZATION
+	// SYSTEMS
 	// =========================
 	function setupSystems():Void
 	{
 		#if ENABLE_AI_MODULE
-		trace("AI Module Enabled");
+		trace("AI Module Loaded");
 		#end
 
 		#if ENABLE_UTILS
-		trace("Utils Module Enabled");
+		trace("Utils Module Loaded");
 		#end
 
-		// Aqui você pode inicializar:
-		// - AI Manager
-		// - Input System
-		// - Camera System
-		// - Modchart System
+		// Futuro:
+		// AIManager.init();
+		// InputSystem.init();
+		// CameraSystem.init();
 	}
 
 	// =========================
@@ -85,9 +110,8 @@ class Main extends Sprite
 	// =========================
 	function update(e:Event):Void
 	{
-		if (!started) return;
+		if (!started || paused) return;
 
-		// Game loop principal
 		engineUpdate();
 	}
 
@@ -96,16 +120,30 @@ class Main extends Sprite
 	// =========================
 	function engineUpdate():Void
 	{
-		// Aqui roda tudo por frame
+		// Loop principal
 
-		// Exemplo:
+		// Exemplo futuro:
 		// AIManager.update();
 		// Input.update();
-		// Camera.update();
 	}
 
 	// =========================
-	// STATIC ENTRY POINT
+	// PAUSE / RESUME
+	// =========================
+	function onPause(e:Event):Void
+	{
+		paused = true;
+		trace("Game Paused");
+	}
+
+	function onResume(e:Event):Void
+	{
+		paused = false;
+		trace("Game Resumed");
+	}
+
+	// =========================
+	// ENTRY POINT
 	// =========================
 	public static function main():Void
 	{
