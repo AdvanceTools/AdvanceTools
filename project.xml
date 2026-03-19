@@ -36,6 +36,7 @@
 	<!-- ========================= -->
 	<haxelib name="lime" />
 	<haxelib name="openfl" />
+ <haxelib name="hxcpp" />
 
 	<!-- ========================= -->
 	<!-- TARGETS -->
