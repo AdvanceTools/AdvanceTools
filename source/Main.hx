@@ -2,26 +2,31 @@ package;
 
 import openfl.display.Sprite;
 import openfl.events.Event;
-import openfl.events.DeactivateEvent;
 import openfl.Lib;
 
 #if html5
 import js.Browser;
 #end
 
-#if android
-import openfl.events.FocusEvent;
-#end
-
 class Main extends Sprite
 {
 	// =========================
-	// CORE
+	// SINGLETON
 	// =========================
 	public static var instance:Main;
 
+	// =========================
+	// ENGINE STATE
+	// =========================
 	public var started:Bool = false;
 	public var paused:Bool = false;
+
+	// Delta time (profissional)
+	public var lastTime:Float = 0;
+	public var deltaTime:Float = 0;
+
+	// FPS control
+	public var targetFPS:Int = 60;
 
 	// =========================
 	// CONSTRUCTOR
@@ -44,31 +49,33 @@ class Main extends Sprite
 	{
 		removeEventListener(Event.ADDED_TO_STAGE, init);
 
-		trace("AdvanceTools Engine Starting...");
+		trace("=== AdvanceTools Engine Boot ===");
 
 		setupStage();
 		setupPlatform();
 		setupSystems();
 
+		lastTime = Lib.getTimer();
+
 		started = true;
 
 		addEventListener(Event.ENTER_FRAME, update);
 
-		// Lifecycle (mobile + geral)
+		// Lifecycle
 		stage.addEventListener(Event.DEACTIVATE, onPause);
 		stage.addEventListener(Event.ACTIVATE, onResume);
 	}
 
 	// =========================
-	// STAGE
+	// STAGE SETUP
 	// =========================
 	function setupStage():Void
 	{
-		stage.frameRate = 60;
+		stage.frameRate = targetFPS;
 	}
 
 	// =========================
-	// PLATFORM DETECTION
+	// PLATFORM
 	// =========================
 	function setupPlatform():Void
 	{
@@ -87,22 +94,25 @@ class Main extends Sprite
 	}
 
 	// =========================
-	// SYSTEMS
+	// SYSTEM INIT
 	// =========================
 	function setupSystems():Void
 	{
+		trace("Initializing Systems...");
+
 		#if ENABLE_AI_MODULE
-		trace("AI Module Loaded");
+		trace("> AI Module Enabled");
 		#end
 
 		#if ENABLE_UTILS
-		trace("Utils Module Loaded");
+		trace("> Utils Module Enabled");
 		#end
 
-		// Futuro:
+		// FUTURO:
 		// AIManager.init();
 		// InputSystem.init();
 		// CameraSystem.init();
+		// ModchartSystem.init();
 	}
 
 	// =========================
@@ -112,19 +122,38 @@ class Main extends Sprite
 	{
 		if (!started || paused) return;
 
-		engineUpdate();
+		// Delta time calculation
+		var currentTime = Lib.getTimer();
+		deltaTime = (currentTime - lastTime) / 1000;
+		lastTime = currentTime;
+
+		engineUpdate(deltaTime);
 	}
 
 	// =========================
 	// ENGINE UPDATE
 	// =========================
-	function engineUpdate():Void
+	function engineUpdate(dt:Float):Void
 	{
-		// Loop principal
+		// Aqui roda tudo por frame
 
 		// Exemplo futuro:
-		// AIManager.update();
-		// Input.update();
+		// AIManager.update(dt);
+		// Input.update(dt);
+		// Camera.update(dt);
+
+		#if debug
+		debugInfo(dt);
+		#end
+	}
+
+	// =========================
+	// DEBUG SYSTEM
+	// =========================
+	function debugInfo(dt:Float):Void
+	{
+		var fps = Std.int(1 / dt);
+		trace("FPS: " + fps + " | DT: " + dt);
 	}
 
 	// =========================
@@ -132,14 +161,23 @@ class Main extends Sprite
 	// =========================
 	function onPause(e:Event):Void
 	{
+		if (paused) return;
+
 		paused = true;
 		trace("Game Paused");
+
+		// FUTURO:
+		// Audio.pauseAll();
 	}
 
 	function onResume(e:Event):Void
 	{
+		if (!paused) return;
+
 		paused = false;
 		trace("Game Resumed");
+
+		lastTime = Lib.getTimer(); // evita bug de delta gigante
 	}
 
 	// =========================
