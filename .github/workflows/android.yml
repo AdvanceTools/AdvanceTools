@@ -1,0 +1,98 @@
+name: Build AdvanceTools (Android)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      # =========================
+      # CHECKOUT
+      # =========================
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # =========================
+      # JAVA (REQUIRED)
+      # =========================
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      # =========================
+      # ANDROID SDK
+      # =========================
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      # =========================
+      # ACCEPT LICENSES
+      # =========================
+      - name: Accept licenses
+        run: yes | sdkmanager --licenses
+
+      # =========================
+      # INSTALL SDK COMPONENTS
+      # =========================
+      - name: Install Android components
+        run: |
+          sdkmanager "platform-tools" \
+                     "platforms;android-33" \
+                     "build-tools;33.0.2"
+
+      # =========================
+      # SETUP HAXE
+      # =========================
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@v1
+        with:
+          haxe-version: 4.3.7
+
+      # =========================
+      # INSTALL LIBS
+      # =========================
+      - name: Install dependencies
+        run: |
+          haxelib install lime
+          haxelib install openfl
+
+      # =========================
+      # SETUP LIME ANDROID
+      # =========================
+      - name: Setup Lime (Android)
+        run: |
+          haxelib run lime setup android
+
+      # =========================
+      # BUILD APK
+      # =========================
+      - name: Build Android
+        run: |
+          haxelib run lime build android -release
+
+      # =========================
+      # DEBUG FILES
+      # =========================
+      - name: Show build files
+        run: |
+          echo "Listing files..."
+          ls -R
+
+      # =========================
+      # UPLOAD APK
+      # =========================
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-build
+          path: |
+            export/android/bin/app/build/outputs/apk/release/
+            export/android/bin/
+            bin/android/
